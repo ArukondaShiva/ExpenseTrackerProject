@@ -1,13 +1,13 @@
 package com.example.expensetracker.service;
 
 import com.example.expensetracker.entity.Expense;
+import com.example.expensetracker.exceptions.ResourceNotFoundException;
 import com.example.expensetracker.repository.ExpenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 
@@ -30,7 +30,7 @@ public class ExpenseServiceImpl implements ExpenseService{
         if(expense.isPresent()){
             return expense.get();
         }
-        throw new RuntimeException("Expense is not found for the id : "+id);
+        throw new ResourceNotFoundException("Expense is not found for the id : "+id);
     }
 
     @Override
