@@ -84,7 +84,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 
     // This is the method which will helps to customize the error response.
-    @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
         //return super.handleMethodArgumentNotValid(ex, headers, status, request);

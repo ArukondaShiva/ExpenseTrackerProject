@@ -20,14 +20,19 @@ public class ExpenseServiceImpl implements ExpenseService{
     @Autowired
     private ExpenseRepository expenseRepository;
 
+
+    @Autowired
+    private UserService userService;
+
+
     @Override
     public Page<Expense> getAllExpenses(Pageable page) {
-        return expenseRepository.findAll(page);
+        return expenseRepository.findByUserId(userService.getLoggedInUser().getId(),page);
     }
 
     @Override
     public Expense getExpenseById(Long id) {
-        Optional<Expense> expense = expenseRepository.findById(id);
+        Optional<Expense> expense = expenseRepository.findByUserIdAndId(userService.getLoggedInUser().getId(),id);
 
         if(expense.isPresent()){
             return expense.get();
@@ -44,6 +49,7 @@ public class ExpenseServiceImpl implements ExpenseService{
 
     @Override
     public Expense saveExpenseDetails(Expense expense) {
+        expense.setUser(userService.getLoggedInUser());
         return expenseRepository.save(expense);
     }
 
@@ -63,12 +69,12 @@ public class ExpenseServiceImpl implements ExpenseService{
 
     @Override
     public List<Expense> readByCategory(String category, Pageable page) {
-        return expenseRepository.findByCategory(category,page).toList();
+        return expenseRepository.findByUserIdAndCategory(userService.getLoggedInUser().getId(),category,page).toList();
     }
 
     @Override
     public List<Expense> readByName(String name, Pageable page) {
-        return expenseRepository.findByNameContaining(name,page).toList();
+        return expenseRepository.findByUserIdAndNameContaining(userService.getLoggedInUser().getId(),name,page).toList();
     }
 
 
@@ -83,7 +89,7 @@ public class ExpenseServiceImpl implements ExpenseService{
             endDate = new Date(System.currentTimeMillis());
         }
 
-        return expenseRepository.findByDateBetween(startDate, endDate, page).toList();
+        return expenseRepository.findByUserIdAndDateBetween(userService.getLoggedInUser().getId(),startDate, endDate, page).toList();
     }
 
 
