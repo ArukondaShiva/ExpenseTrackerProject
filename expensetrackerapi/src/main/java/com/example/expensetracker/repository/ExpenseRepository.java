@@ -15,13 +15,15 @@ public interface ExpenseRepository extends JpaRepository<Expense,Long> {
 
      Page<Expense> findByUserIdAndCategory(Long userId,String category, Pageable page);
 
+     Page<Expense> findByUserIdAndCategoryId(Long userId,Long categoryId, Pageable page);
+
      Page<Expense> findByUserIdAndNameContaining(Long userId,String keyword,Pageable page);
 
      Page<Expense> findByUserIdAndDateBetween(Long userId,Date startDate,Date endDate,Pageable page);
 
      Page<Expense> findByUserId(Long userId, Pageable pageable);
 
-     Optional<Expense> findByUserIdAndId(Long userId, Long expenseId);
+     Optional<Expense> findByUserIdAndExpenseId(Long userId, String expenseId);
 
 
 }

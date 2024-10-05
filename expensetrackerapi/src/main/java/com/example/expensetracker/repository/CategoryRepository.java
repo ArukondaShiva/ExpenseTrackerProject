@@ -46,5 +46,12 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity,Long>{
     boolean existsByNameAndUserId(String name,Long userId);
 
 
+    /**
+     * it retrives the category by name and user id
+     * @param name
+     * @param userId
+     * @return Optional<CategoryEntity>
+     */
+    Optional<CategoryEntity> findByNameAndUserId(String name,Long userId);
 
 }
