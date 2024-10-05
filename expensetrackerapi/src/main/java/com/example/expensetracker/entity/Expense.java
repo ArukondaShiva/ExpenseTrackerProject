@@ -2,10 +2,8 @@ package com.example.expensetracker.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -23,6 +21,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @Entity
 @Table(name = "tbl_expenses")
+@Builder
 public class Expense {
 
 
@@ -31,9 +30,11 @@ public class Expense {
     private Long id;
 
 
+    @Column(unique = true)
+    private String expenseId;
+
+
     @Column(name = "expense_name")
-    @NotBlank(message = "Expense name must not be null")
-    @Size(min = 3,message = "Expense name should have atleast 3 characters")
     private String name;
 
 
@@ -41,15 +42,16 @@ public class Expense {
 
 
     @Column(name = "expense_amount")
-    @NotNull(message = "expense amount must not be null")
     private BigDecimal amount;
 
 
-    @NotBlank(message = "Category must not be null")
-    private String category;
+    @ManyToOne(fetch = FetchType.LAZY,optional = false)
+    @JoinColumn(name = "category_id",nullable = false)
+    @OnDelete(action = OnDeleteAction.RESTRICT)
+    private CategoryEntity category;
+    // deleting category without deleting mapped expenses is not allowed.
 
 
-    @NotNull(message = "Date must not be null")
     private Date date;
 
 
