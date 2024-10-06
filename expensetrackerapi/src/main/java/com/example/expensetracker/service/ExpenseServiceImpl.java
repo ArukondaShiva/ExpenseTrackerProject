@@ -5,6 +5,7 @@ import com.example.expensetracker.dto.ExpenseDTO;
 import com.example.expensetracker.entity.CategoryEntity;
 import com.example.expensetracker.entity.Expense;
 import com.example.expensetracker.exceptions.ResourceNotFoundException;
+import com.example.expensetracker.mapper.ExpenseMapper;
 import com.example.expensetracker.repository.CategoryRepository;
 import com.example.expensetracker.repository.ExpenseRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,19 +31,20 @@ public class ExpenseServiceImpl implements ExpenseService{
 
     private final CategoryRepository categoryRepository;
 
+    private final ExpenseMapper expenseMapper;
 
     @Override
     public List<ExpenseDTO> getAllExpenses(Pageable page) {
 
         List<Expense> listOfExpense = expenseRepository.findByUserId(userService.getLoggedInUser().getId(),page).toList();
-        return listOfExpense.stream().map(expense -> mapToDTO(expense)).collect(Collectors.toList());
+        return listOfExpense.stream().map(expense -> expenseMapper.mapToExpenseDtO(expense)).collect(Collectors.toList());
 
     }
 
     @Override
     public ExpenseDTO getExpenseById(String expenseId) {
         Expense existingExpense = getExpenseEntity(expenseId);
-        return mapToDTO(existingExpense);
+        return expenseMapper.mapToExpenseDtO(existingExpense);
     }
 
 
@@ -75,7 +77,7 @@ public class ExpenseServiceImpl implements ExpenseService{
         expenseDTO.setExpenseId(UUID.randomUUID().toString());
 
         // map to entity object
-        Expense newExpense = mapToEntity(expenseDTO);
+        Expense newExpense = expenseMapper.mapToExpenseEntity(expenseDTO);
 
         // save to the DB
         newExpense.setCategory(optionalCategory.get());
@@ -83,42 +85,9 @@ public class ExpenseServiceImpl implements ExpenseService{
         newExpense = expenseRepository.save(newExpense);
 
         // map to response object
-        return mapToDTO(newExpense);
+        return expenseMapper.mapToExpenseDtO(newExpense);
     }
 
-    private ExpenseDTO mapToDTO(Expense newExpense) {
-
-        return ExpenseDTO.builder()
-                .expenseId(newExpense.getExpenseId())
-                .name(newExpense.getName())
-                .description(newExpense.getDescription())
-                .amount(newExpense.getAmount())
-                .date(newExpense.getDate())
-                .createdAt(newExpense.getCreatedAt())
-                .updatedAt(newExpense.getUpdatedAt())
-                .categoryDTO(mapToCategoryDTO(newExpense.getCategory()))
-                .build();
-
-    }
-
-    private CategoryDTO mapToCategoryDTO(CategoryEntity category){
-
-        return CategoryDTO.builder()
-                .name(category.getName())
-                .categoryId(category.getCategoryId())
-                .build();
-    }
-
-    private Expense mapToEntity(ExpenseDTO expenseDTO) {
-
-        return Expense.builder()
-                .expenseId(expenseDTO.getExpenseId())
-                .name(expenseDTO.getName())
-                .description(expenseDTO.getDescription())
-                .date(expenseDTO.getDate())
-                .amount(expenseDTO.getAmount())
-                .build();
-    }
 
     @Override
     public ExpenseDTO updateExpenseDetails(String expenseId, ExpenseDTO expenseDTO) {
@@ -140,7 +109,7 @@ public class ExpenseServiceImpl implements ExpenseService{
 
         existingExpense = expenseRepository.save(existingExpense);
 
-        return mapToDTO(existingExpense);
+        return expenseMapper.mapToExpenseDtO(existingExpense);
     }
 
     @Override
@@ -153,13 +122,13 @@ public class ExpenseServiceImpl implements ExpenseService{
         }
 
         List<Expense> list = expenseRepository.findByUserIdAndCategoryId(userService.getLoggedInUser().getId(),optionalCategory.get().getId(),page).toList();
-        return list.stream().map(expense -> mapToDTO(expense)).collect(Collectors.toList());
+        return list.stream().map(expense -> expenseMapper.mapToExpenseDtO(expense)).collect(Collectors.toList());
     }
 
     @Override
     public List<ExpenseDTO> readByName(String name, Pageable page) {
         List<Expense> list = expenseRepository.findByUserIdAndNameContaining(userService.getLoggedInUser().getId(),name,page).toList();
-        return list.stream().map(expense -> mapToDTO(expense)).collect(Collectors.toList());
+        return list.stream().map(expense -> expenseMapper.mapToExpenseDtO(expense)).collect(Collectors.toList());
     }
 
 
@@ -176,7 +145,7 @@ public class ExpenseServiceImpl implements ExpenseService{
 
         List<Expense> list = expenseRepository.findByUserIdAndDateBetween(userService.getLoggedInUser().getId(),startDate, endDate, page).toList();
 
-        return list.stream().map(expense -> mapToDTO(expense)).collect(Collectors.toList());
+        return list.stream().map(expense -> expenseMapper.mapToExpenseDtO(expense)).collect(Collectors.toList());
     }
 
 
